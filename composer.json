@@ -1,0 +1,24 @@
+{
+    "name": "drupal/embed_block",
+    "description": "Allows embedding blocks into content by using a text filter.",
+    "type": "drupal-module",
+    "keywords": [
+        "Drupal",
+        "block",
+        "filter",
+        "embed"
+    ],
+    "license": "GPL-2.0+",
+    "homepage": "https://www.drupal.org/project/embed_block",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/embed_block",
+        "source": "https://git.drupalcode.org/project/embed_block"
+    },
+    "authors": [
+        {
+            "name": "Claudiu Cristea",
+            "homepage": "https://www.drupal.org/u/claudiu.cristea",
+            "role": "maintainer"
+        }
+    ]
+}
