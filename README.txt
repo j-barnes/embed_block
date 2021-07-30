@@ -1,10 +1,14 @@
-Embed Block is tiny module that renders a block into formatted text by using a
-format filter.
+Embed Block is a module that renders a block into formatted text by using a
+format filter. It features a built in CKEditor plugin for easy selections of
+any block.
 
-On order to embed a block in text, you should add the following placeholder:
-`{block:PLUGIN_ID}`, where `PLUGIN_ID` is the block plugin identifier. The block
-access is checked against the current user and if the access is denied, the
-filter replaces the placeholder with an empty string (""). If the specified
-plugin ID doesn't exist, the placeholder is kept unchanged.
+On order to embed a block you will first need to visit
+Configuration > Content Authoring > Text Formats and Editors and configure
+the correct editor.
+
+From here you can drag the "Embed Block" icon into the toolbar.
+If "Limit allowed HTML" is enabled, you will need to add the
+<embed-block class data-block-id> to the allowed list.
+
 
 

@@ -87,13 +87,11 @@ class EmbedBlockFilter extends FilterBase implements ContainerFactoryPluginInter
   public function process($text, $langcode) {
     $response = new FilterProcessResult();
 
-    preg_match_all('/{block:(?<plugin_id>[^}].*)}/', $text, $match, PREG_SET_ORDER);
+    preg_match_all('/<embed-block .*?data-block-id="([^"]*)">(.*?)<\/embed-block>/', $text, $match, PREG_SET_ORDER);
 
     $processed = [];
     foreach ($match as $found) {
-      // A block could occur multiple times. We optimize the number of
-      // replacements by keeping track on replacements already made.
-      if (!isset($processed[$found['plugin_id']])) {
+      if (!isset($processed[$found[1]])) {
         try {
           /** @var \Drupal\Core\Block\BlockPluginInterface $block_plugin */
           $block_plugin = $this->blockPluginManager->createInstance($found[1]);
@@ -101,9 +99,8 @@ class EmbedBlockFilter extends FilterBase implements ContainerFactoryPluginInter
             $build = $block_plugin->build();
             $block_content = $this->renderer->render($build);
           }
-          // If the user cannot access the block, means that the block exists
-          // but should not be rendered, so we still have to replace the
-          // placeholder with an empty string.
+
+          // User does not have access, set empty string.
           else {
             $block_content = '';
           }
@@ -117,11 +114,11 @@ class EmbedBlockFilter extends FilterBase implements ContainerFactoryPluginInter
         catch (PluginException $exception) {
           // The plugin doesn't exist, we don't touch the placeholder.
         }
-        $processed[$found['plugin_id']] = TRUE;
+        $processed[$found[1]] = TRUE;
       }
     }
-
     return $response->setProcessedText($text);
+
   }
 
 }
