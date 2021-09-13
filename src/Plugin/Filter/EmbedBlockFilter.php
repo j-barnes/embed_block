@@ -9,6 +9,7 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Plugin\FilterBase;
+use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -95,8 +96,27 @@ class EmbedBlockFilter extends FilterBase implements ContainerFactoryPluginInter
         try {
           /** @var \Drupal\Core\Block\BlockPluginInterface $block_plugin */
           $block_plugin = $this->blockPluginManager->createInstance($found[1]);
+
+          // Inject runtime contexts.
+          if ($block_plugin instanceof ContextAwarePluginInterface) {
+            $contexts = \Drupal::service('context.repository')->getRuntimeContexts($block_plugin->getContextMapping());
+            \Drupal::service('context.handler')->applyContextMapping($block_plugin, $contexts);
+          }
+
+          // Check access.
           if ($block_plugin->access($this->currentUser)) {
-            $build = $block_plugin->build();
+            $build = [
+              '#theme' => 'block',
+              '#id' => $configuration['id'] ?? NULL,
+              '#attributes' => [],
+              '#contextual_links' => [],
+              '#configuration' => $block_plugin->getConfiguration(),
+              '#plugin_id' => $block_plugin->getPluginId(),
+              '#base_plugin_id' => $block_plugin->getBaseId(),
+              '#derivative_plugin_id' => $block_plugin->getDerivativeId(),
+            ];
+
+            $build['content'] = $block_plugin->build();
             $block_content = $this->renderer->render($build);
           }
 
