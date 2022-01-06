@@ -1,0 +1,8 @@
+.cke_editable .embed-block {
+  border: 1px dashed #ccc;
+  padding: 1px;
+  background: #fffde3;
+}
+.cke_editable .embed-block::before {
+  content: "▩ ";
+}

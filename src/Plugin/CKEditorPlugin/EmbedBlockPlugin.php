@@ -2,6 +2,7 @@
 
 namespace Drupal\embed_block\Plugin\CKEditorPlugin;
 
+use Drupal\ckeditor\CKEditorPluginCssInterface;
 use Drupal\ckeditor\CKEditorPluginBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -16,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   label = @Translation("Embed Block Plugin")
  * )
  */
-class EmbedBlockPlugin extends CKEditorPluginBase implements ContainerFactoryPluginInterface {
+class EmbedBlockPlugin extends CKEditorPluginBase implements ContainerFactoryPluginInterface, CKEditorPluginCssInterface {
 
   /**
    * The config factory.
@@ -52,23 +53,9 @@ class EmbedBlockPlugin extends CKEditorPluginBase implements ContainerFactoryPlu
     return [
       'EmbedBlock' => [
         'label' => $this->t('Embed Block'),
-        'image' => drupal_get_path('module', 'embed_block') . '/plugins/embed_block/icons/icon.png',
+        'image' => \Drupal::service('extension.list.module')->getPath('embed_block') . '/plugins/embed_block/icons/icon.png',
       ],
     ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isInternal() {
-    return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getDependencies(Editor $editor) {
-    return [];
   }
 
   /**
@@ -84,7 +71,7 @@ class EmbedBlockPlugin extends CKEditorPluginBase implements ContainerFactoryPlu
    * {@inheritdoc}
    */
   public function getFile() {
-    return drupal_get_path('module', 'embed_block') . '/plugins/embed_block/plugin.js';
+    return \Drupal::service('extension.list.module')->getPath('embed_block') . '/plugins/embed_block/plugin.js';
   }
 
   /**
@@ -92,6 +79,15 @@ class EmbedBlockPlugin extends CKEditorPluginBase implements ContainerFactoryPlu
    */
   public function getConfig(Editor $editor) {
     return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCssFiles(Editor $editor) {
+    return [
+      \Drupal::service('extension.list.module')->getPath('embed_block') . '/css/style.css',
+    ];
   }
 
 }

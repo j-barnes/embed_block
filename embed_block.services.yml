@@ -1,4 +1,0 @@
-services:
-  embedBlock:
-    class: Drupal\embed_block\EmbedBlock
-    arguments: ['@plugin.manager.block', '@context.repository']

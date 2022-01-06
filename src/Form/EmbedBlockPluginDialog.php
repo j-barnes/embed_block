@@ -76,7 +76,7 @@ class EmbedBlockPluginDialog extends FormBase implements BaseFormIdInterface {
    */
   public function buildForm(array $form, FormStateInterface $form_state, EditorInterface $editor = NULL, FilterFormat $filter_format = NULL) {
     $input = $form_state->getUserInput();
-    $block_id = isset($input['editor_object']['data-block-id']) ? $input['editor_object']['data-block-id'] : [];
+    $block_id = $input['editor_object']['data-block-id'] ?? [];
     $form['#tree'] = TRUE;
     $form['#attached']['library'][] = 'editor/drupal.editor.dialog';
     $form['#attached']['library'][] = 'core/drupal.dialog.ajax';
@@ -141,6 +141,8 @@ class EmbedBlockPluginDialog extends FormBase implements BaseFormIdInterface {
 
   /**
    * Returns an key => value array based on allowed blocks.
+   *
+   * Generates hierarchy for block selection dropdown.
    *
    * @return array
    *   Array of options from definitions.

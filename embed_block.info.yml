@@ -1,9 +1,7 @@
 type: module
-name: 'Embed Block'
-description: 'Allows embedding blocks into content by using a text filter.'
+name: "Embed Block"
+description: "Allows embedding blocks into content by using a text filter."
 core_version_requirement: ^8 || ^9
 
 dependencies:
   - drupal:filter
-  - drupal:editor
-  - drupal:embed

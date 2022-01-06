@@ -86,11 +86,26 @@ class EmbedBlockFilter extends FilterBase implements ContainerFactoryPluginInter
    * {@inheritdoc}
    */
   public function process($text, $langcode) {
+    preg_match_all('/<drupal-embed-block\s+.*?data-block-id="([^"]*)">(.*?)<\/drupal-embed-block>/', $text, $match, PREG_SET_ORDER);
+    preg_match_all('/{block:(?<plugin_id>[^}].*)}/', $text, $deprecated_match, PREG_SET_ORDER);
+
+    // Trigger deprecated warning if we find the older block syntax.
+    if (!empty($deprecated_match)) {
+      @trigger_error('The {block:plugin_id} syntax is deprecated in embed_block:8.x-1.1 and is removed from embed_block:8.x-2.0. Use the <drupal-embed-block> format instead. See https://www.drupal.org/project/embed_block/issues/3225938', E_USER_DEPRECATED);
+    }
+
+    $deprecated_response = $this->processTextReplacements($text, $deprecated_match);
+    $response = $this->processTextReplacements($deprecated_response->getProcessedText(), $match);
+    return $response;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function processTextReplacements($text, $match) {
     $response = new FilterProcessResult();
-
-    preg_match_all('/<embed-block .*?data-block-id="([^"]*)">(.*?)<\/embed-block>/', $text, $match, PREG_SET_ORDER);
-
     $processed = [];
+
     foreach ($match as $found) {
       if (!isset($processed[$found[1]])) {
         try {
@@ -106,10 +121,6 @@ class EmbedBlockFilter extends FilterBase implements ContainerFactoryPluginInter
           // Check access.
           if ($block_plugin->access($this->currentUser)) {
             $build = [
-              '#theme' => 'block',
-              '#id' => $configuration['id'] ?? NULL,
-              '#attributes' => [],
-              '#contextual_links' => [],
               '#configuration' => $block_plugin->getConfiguration(),
               '#plugin_id' => $block_plugin->getPluginId(),
               '#base_plugin_id' => $block_plugin->getBaseId(),
@@ -137,8 +148,8 @@ class EmbedBlockFilter extends FilterBase implements ContainerFactoryPluginInter
         $processed[$found[1]] = TRUE;
       }
     }
-    return $response->setProcessedText($text);
-
+    $response->setProcessedText($text);
+    return $response;
   }
 
 }
