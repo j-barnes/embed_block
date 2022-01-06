@@ -4,7 +4,7 @@ namespace Drupal\embed_block\Plugin\CKEditorPlugin;
 
 use Drupal\ckeditor\CKEditorPluginCssInterface;
 use Drupal\ckeditor\CKEditorPluginBase;
-use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\editor\Entity\Editor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -20,40 +20,40 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EmbedBlockPlugin extends CKEditorPluginBase implements ContainerFactoryPluginInterface, CKEditorPluginCssInterface {
 
   /**
-   * The config factory.
+   * The module extension list.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var \Drupal\Core\Extension\ModuleExtensionList
    */
-  protected $configFactory;
+  protected $moduleExtensionList;
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ModuleExtensionList $module_extension_list) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->configFactory = $config_factory;
+    $this->moduleExtensionList = $module_extension_list;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('config.factory')
+      $container->get('extension.list.module'),
     );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getButtons() {
+  public function getButtons(): array {
     return [
       'EmbedBlock' => [
         'label' => $this->t('Embed Block'),
-        'image' => \Drupal::service('extension.list.module')->getPath('embed_block') . '/plugins/embed_block/icons/icon.png',
+        'image' => $this->moduleExtensionList->getPath('embed_block') . '/plugins/embed_block/icons/icon.png',
       ],
     ];
   }
@@ -61,7 +61,7 @@ class EmbedBlockPlugin extends CKEditorPluginBase implements ContainerFactoryPlu
   /**
    * {@inheritdoc}
    */
-  public function getLibraries(Editor $editor) {
+  public function getLibraries(Editor $editor): array {
     return [
       'core/drupal.ajax',
     ];
@@ -70,23 +70,23 @@ class EmbedBlockPlugin extends CKEditorPluginBase implements ContainerFactoryPlu
   /**
    * {@inheritdoc}
    */
-  public function getFile() {
-    return \Drupal::service('extension.list.module')->getPath('embed_block') . '/plugins/embed_block/plugin.js';
+  public function getFile(): string {
+    return $this->moduleExtensionList->getPath('embed_block') . '/plugins/embed_block/plugin.js';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getConfig(Editor $editor) {
+  public function getConfig(Editor $editor): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCssFiles(Editor $editor) {
+  public function getCssFiles(Editor $editor): array {
     return [
-      \Drupal::service('extension.list.module')->getPath('embed_block') . '/css/style.css',
+      $this->moduleExtensionList->getPath('embed_block') . '/css/style.css',
     ];
   }
 

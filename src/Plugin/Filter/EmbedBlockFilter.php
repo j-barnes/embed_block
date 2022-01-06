@@ -5,6 +5,8 @@ namespace Drupal\embed_block\Plugin\Filter;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\ContextHandlerInterface;
+use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\filter\FilterProcessResult;
@@ -46,6 +48,20 @@ class EmbedBlockFilter extends FilterBase implements ContainerFactoryPluginInter
   protected $currentUser;
 
   /**
+   * The Drupal context repository.
+   *
+   * @var \Drupal\context\Entity\ContextRepositoryInterface
+   */
+  protected $contextRepository;
+
+  /**
+   * The plugin context handler.
+   *
+   * @var \Drupal\Core\Plugin\Context\ContextHandlerInterface
+   */
+  protected $contextHandler;
+
+  /**
    * Creates a new filter class instance.
    *
    * @param array $configuration
@@ -60,25 +76,33 @@ class EmbedBlockFilter extends FilterBase implements ContainerFactoryPluginInter
    *   The renderer service.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
+   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $context_repository
+   *   Context repository service.
+   * @param \Drupal\Core\Plugin\Context\ContextHandlerInterface $context_handler
+   *   The plugin context handler.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, BlockManagerInterface $block_plugin_manager, RendererInterface $renderer, AccountInterface $current_user) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, BlockManagerInterface $block_plugin_manager, RendererInterface $renderer, AccountInterface $current_user, ContextRepositoryInterface $context_repository, ContextHandlerInterface $context_handler) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->blockPluginManager = $block_plugin_manager;
     $this->renderer = $renderer;
     $this->currentUser = $current_user;
+    $this->contextRepository = $context_repository;
+    $this->contextHandler = $context_handler;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
       $container->get('plugin.manager.block'),
       $container->get('renderer'),
-      $container->get('current_user')
+      $container->get('current_user'),
+      $container->get('context.repository'),
+      $container->get('context.handler'),
     );
   }
 
@@ -114,8 +138,8 @@ class EmbedBlockFilter extends FilterBase implements ContainerFactoryPluginInter
 
           // Inject runtime contexts.
           if ($block_plugin instanceof ContextAwarePluginInterface) {
-            $contexts = \Drupal::service('context.repository')->getRuntimeContexts($block_plugin->getContextMapping());
-            \Drupal::service('context.handler')->applyContextMapping($block_plugin, $contexts);
+            $contexts = $this->contextRepository->getRuntimeContexts($block_plugin->getContextMapping());
+            $this->contextHandler->applyContextMapping($block_plugin, $contexts);
           }
 
           // Check access.

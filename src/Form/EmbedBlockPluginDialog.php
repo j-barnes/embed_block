@@ -50,7 +50,7 @@ class EmbedBlockPluginDialog extends FormBase implements BaseFormIdInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): self {
     return new static(
       $container->get('context.repository'),
       $container->get('plugin.manager.block'),
@@ -60,21 +60,21 @@ class EmbedBlockPluginDialog extends FormBase implements BaseFormIdInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'embed_block_dialog';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getBaseFormId() {
+  public function getBaseFormId(): string {
     return 'editor_embed_block_dialog';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, EditorInterface $editor = NULL, FilterFormat $filter_format = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, EditorInterface $editor = NULL, FilterFormat $filter_format = NULL): array {
     $input = $form_state->getUserInput();
     $block_id = $input['editor_object']['data-block-id'] ?? [];
     $form['#tree'] = TRUE;
@@ -86,9 +86,6 @@ class EmbedBlockPluginDialog extends FormBase implements BaseFormIdInterface {
     $form['embed_block'] = [
       '#title' => $this->t('Select Block'),
       '#type' => 'select',
-      '#attributes' => [
-        'style' => 'width: 100%;',
-      ],
       '#options' => $this->getBlockOptions(),
       '#default_value' => $block_id,
     ];
@@ -148,8 +145,9 @@ class EmbedBlockPluginDialog extends FormBase implements BaseFormIdInterface {
    *   Array of options from definitions.
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
+   *   Thrown if the plugin ID cannot be found.
    */
-  public function getBlockOptions() {
+  public function getBlockOptions(): array {
     $options = [];
     foreach ($this->getBlockDefinitions() as $plugin_id => $definition) {
       $category = (string) $definition['category'];
@@ -163,10 +161,8 @@ class EmbedBlockPluginDialog extends FormBase implements BaseFormIdInterface {
    *
    * @return array
    *   Array of block definitions.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
-  public function getBlockDefinitions() {
+  public function getBlockDefinitions(): array {
     return $this->blockManager->getDefinitionsForContexts($this->contextRepository->getAvailableContexts());
   }
 
