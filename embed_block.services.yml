@@ -1,0 +1,5 @@
+services:
+  access_check.embed_block_filter_in_use:
+    class: Drupal\embed_block\Access\EmbedBlockFilterInUse
+    tags:
+      - { name: access_check, applies_to: _access_embed_block_filter_in_use }
