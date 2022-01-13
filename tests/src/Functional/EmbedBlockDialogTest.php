@@ -26,11 +26,11 @@ class EmbedBlockDialogTest extends EmbedBlockTestBase {
     ]);
     $editor->save();
 
-    // Dialog is not accessible if filter does not have editor configuration.
+    // Dialog is not accessible if filter does not have EmbedBlock button.
     $this->drupalGet('/embed-block/dialog/plain_text');
     $this->assertSession()->statusCodeEquals(403);
 
-    // Route is accessible with a valid filter that does have configuration.
+    // Route is accessible with a valid filter that contains EmbedBlock.
     $this->drupalGet('/embed-block/dialog/custom_format');
     $this->assertSession()->statusCodeEquals(200);
   }

@@ -44,7 +44,7 @@
       range.shrink(CKEDITOR.SHRINK_TEXT);
       return editor
         .elementPath(range.getCommonAncestor())
-        .contains("embed-block", 1);
+        .contains("drupal-embed-block", 1);
     }
     return selectedElement;
   }

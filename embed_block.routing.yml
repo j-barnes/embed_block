@@ -1,8 +1,7 @@
 embed_block.dialog:
-  path: '/embed-block/dialog/{filter_format}'
+  path: '/embed-block/dialog/{editor}'
   defaults:
     _form: '\Drupal\embed_block\Form\EmbedBlockPluginDialog'
     _title: 'Add Block'
   requirements:
-    _entity_access: 'filter_format.use'
     _access_embed_block_filter_in_use: 'TRUE'

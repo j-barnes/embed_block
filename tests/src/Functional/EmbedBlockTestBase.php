@@ -70,7 +70,7 @@ abstract class EmbedBlockTestBase extends BrowserTestBase {
     $editor_group = [
       'name' => 'Embed Block',
       'items' => [
-        'embed_block',
+        'EmbedBlock',
       ],
     ];
     $editor = Editor::create([
